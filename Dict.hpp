@@ -59,6 +59,7 @@ public:
     }
 
     V& operator[](const K& k){
+       // std::cout << "Jestemw[]" << std::endl;
         return array[hash(k)].find_pair(k)->second;
     }
 

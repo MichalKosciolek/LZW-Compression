@@ -144,6 +144,18 @@ public:
         }
         return nullptr;
     }
+/*
+    T& get_next(T x)
+    {
+        Node<T> *walk = guard.next;
+        for(int i=0; i<size(); i++)
+        {
+            if(walk->data == x)
+                return &(walk->next);
+            walk = walk->next;
+        }
+        return nullptr;
+    }*/
 
     /* Usuwa z listy element x */
     T erase(int i)

@@ -4,7 +4,7 @@ LDFLAGS :=
 sources = LZW Dict LinkedList
 objects = $(addsuffix .o,$(objects))
 EXEC1 = LZW.x
-INPUT_FILE = pan_tadeusz.txt
+INPUT_FILE = Romeo-and-Juliet.txt
 
 .PHONY: clean run
 
