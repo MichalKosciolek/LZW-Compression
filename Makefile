@@ -20,6 +20,7 @@ Dict.o: LZW.cpp Dict.hpp LinkedList.hpp
 
 run: $(EXEC1)
 	./$(EXEC1) $(INPUT_FILE)
+	diff -s $(INPUT_FILE) decompressed.txt
 
 clean:
 	$(RM) *.o *.x

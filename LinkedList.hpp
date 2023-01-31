@@ -107,15 +107,9 @@ public:
     /* Czysci liste */
     void clear()
     {
-        Node<T> *walk = guard.prev;
-        Node<T> *tmp;
-        for(int i=0; i<size(); i++)
-        {
-            tmp = walk;
-            walk = walk->prev;
-            delete tmp;
+        for(int i=0; i<size();) {
+            pop_back();
         }
-        size_ = 0;
     }
 
     /* Zwraca pozycje pierwszego wystapienia elementu x */
@@ -144,18 +138,6 @@ public:
         }
         return nullptr;
     }
-/*
-    T& get_next(T x)
-    {
-        Node<T> *walk = guard.next;
-        for(int i=0; i<size(); i++)
-        {
-            if(walk->data == x)
-                return &(walk->next);
-            walk = walk->next;
-        }
-        return nullptr;
-    }*/
 
     /* Usuwa z listy element x */
     T erase(int i)

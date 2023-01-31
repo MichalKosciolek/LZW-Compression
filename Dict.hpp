@@ -11,14 +11,13 @@
 #include "LinkedList.hpp"
 
 /* Funkcja haszujaca */
-unsigned int hash(const std::string& str){
-    char* c = new char[str.length()+1];
-    strcpy(c, str.c_str());
+unsigned int hash(const std::string &str)
+{
     unsigned int h = 0;
-    for (int i=0; c[i]; i++)
-        h = (h << 3) ^ c[i];
-    delete[] c;
-    return h%1000;
+    for(char c : str){
+        h = (h << 5)^(h >> 27)^c;
+    }
+    return h%1024;
 }
 
 template<class K, class V>
@@ -30,9 +29,11 @@ public:
 
     /* Czysci tablice */
     void clear(){
-        for(auto & i : array){
-            i.clear();
+        for(int i=0; i<1025; i++){
+            array[i].clear();
         }
+        size_ = 0;
+        classes_counter = 0;
     }
 
     /* Wstawia do tablicy pare p */
@@ -104,7 +105,7 @@ public:
         clear();
     }
 private:
-    List<Pair> array[1001];
+    List<Pair> array[1025];
     int size_;
     int classes_counter;
 };

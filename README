@@ -1,0 +1,34 @@
+========================================================================
+Autor: Michal Kosciolek
+========================================================================
+
+* Zawartosc:
+============
+
+Katalog LZWcompression zawiera narzedzie do kompresji plikow tekstowych:
+--------------------------------------------------------------------
+
+(a) Narzedzie do kompresji plikow tekstowych.
+  1) LZW.cpp  - program glowny.
+	2) Dict.hpp - plik naglowkowy z implementacja tablicy z haszowaniem.
+	3) LinkedList.hpp - plik naglowkowy z implementacja listy wiazanej.
+	4) Romeo-and-Juliet.txt - przykladowy plik do kompresji.
+
+------------------------------------------------------------------------
+
+* Jak uruchomic programy:
+=========================
+
+Katalog zawiera program Makefile do kompilacji, linkowania
+i uruchamiania powyzszych programow, a takze czyszczenia katalogu.
+
+-> Aby skompilowac programy nalezy wykonac komende:
+	    make
+
+-> Aby uruchomic program, nalezy wykonac komende:
+       	make run
+
+-> Aby wyczyscic zawartosc katalogu (usunac zbedne pliki), nalezy wykonac:
+       	make clean
+
+========================================================================

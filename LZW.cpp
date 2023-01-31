@@ -1,82 +1,127 @@
+/*
+ Narzedzie do kompresji oparte o algorytm LZW.
+ ----------------------------------------------------------------------
+ Autor: Michal Kosciolek
+ ----------------------------------------------------------------------
+*/
+
 #include <fstream>
 #include "Dict.hpp"
 
+const int dict_size = 2048;
+
 void LZWcompress(const std::string& inputFile){
-    Dict<std::string, int> dict;
-    std::pair<std::string, int> p;
-    const int buffer_size = 600;
+    Dict<std::string, std::string> dict;
+    std::pair<std::string, std::string> p;
+
+    //Tworzenie domyslej wersji slownika
     for(int i=0; i<256; i++){
-        p = std::make_pair(i, (unsigned char) i);
+        p = std::make_pair(i, std::to_string(i));
         dict.insert(p);
     }
 
-    std::ifstream input (inputFile, std::ifstream::binary);
-    std::ofstream output ("compressed.txt", std::ifstream::binary);
+    std::ifstream input (inputFile);
+    std::ofstream output ("compressed.dat", std::ios::out | std::ifstream::binary);
+
+    //Zapisywanie rozmiaru pliku do kompresji
     input.seekg(0, std::ios::end);
     int inputFileSize = input.tellg();
     input.seekg (0, input.beg);
-    char * buffer = new char[buffer_size+1];
+
     if(output.is_open() && input.is_open()){
-        while(true){
-            input.read(buffer, buffer_size);
-            int code = 256;
-            std::string next;
-            std::string toCompress(buffer);
-            std::string current(1, toCompress[0]);
-            for(int i=0; i<toCompress.size(); i++){
-                if(i != toCompress.size()-1)
-                    next += toCompress[i+1];
-                if(dict.find(current + next)){
-                    current += next;
-                }
-                else{
-                    p = std::make_pair(current + next, code);
-                    output << dict[current] << " ";
-                    dict.insert(p);
-                    current = next;
-                    code++;
-                }
-                next.clear();
-            }
-            output << dict[current] << " ";
-            if(input.eof())
-                break;
+
+        //Wczytywanie danych z pliku do listy
+        char ch;
+        List<char> in;
+        while (input >> std::noskipws >> ch) {
+            in.push_back(ch);
         }
+
+        int code = 256;
+        std::string next;
+        std::string current(1, in.pop_front());
+        while(in.size()){
+
+            //Resetowanie slownika do stanu domyslnego
+            if(code == dict_size){
+                output << dict[current] << " ";
+                dict.clear();
+                for(int j=0; j<256; j++){
+                    p = std::make_pair(j, std::to_string(j));
+                    dict.insert(p);
+                }
+                code = 256;
+                next.clear();
+                current = std::string(1,in.pop_front());
+            }
+
+            if(in.size() != 0){
+                next += in.pop_front();
+            }
+            if(dict.find(current + next)){
+                current += next;
+            }
+            else{
+                p = std::make_pair(current + next, std::to_string(code));
+                output << dict[current] << " ";
+                dict.insert(p);
+                current = next;
+                code++;
+            }
+            next.clear();
+        }
+        output << dict[current];
+
         int compressedFileSize = output.tellp();
         std::cout << "Kompresja udana." << std::endl << "Rozmiar oryginalnego pliku: " << inputFileSize << " bajtow."
                   << std::endl << "Rozmiar skompresowanego pliku: " << compressedFileSize << " bajtow." << std::endl
                   << "Wspolczynnik kompresji wynosi: " << (double)compressedFileSize/(double)inputFileSize*100 << "%" << std::endl;
         output.close();
         input.close();
-        delete[] buffer;
     }
 }
 
-void LZWdecompress(std::string inputFile){
+void LZWdecompress(const std::string& inputFile){
     Dict<std::string, std::string> dict;
     std::pair<std::string, std::string> p;
+
+    //Tworzenie domyslej wersji slownika
     for(int i=0; i<256; i++){
         p = std::make_pair(std::to_string(i), i);
         dict.insert(p);
     }
-    std::ifstream input (inputFile, std::ifstream::binary);
-    //std::ifstream input ("compressed2.txt", std::ifstream::binary);
-    std::ofstream output ("decompressed.txt", std::ifstream::binary);
+    std::ifstream input (inputFile, std::ios::in | std::ifstream::binary);
+    std::ofstream output ("decompressed.txt");
 
     if(output.is_open() && input.is_open()){
         std::string character;
         List<std::string> toDecode;
         int code = 256;
+
+        //Wczytywanie danych do dekompresji
         while(input >> character){
             toDecode.push_back(character);
         }
+
         std::string prev = toDecode.pop_front();
         std::string current = dict[prev];
         std::string first;
         output << current;
+
         int size = toDecode.size();
         for(int i=0; i<size; i++){
             std::string next = toDecode.pop_front();
+
+            //Resetowanie slownika do stanu domyslnego
+            if(code == dict_size+1){
+                dict.clear();
+                for(int j=0; j<256; j++){
+                    p = std::make_pair(std::to_string(j), j);
+                    dict.insert(p);
+                }
+                code = 256;
+            }
+
             if(!dict.find(next)){
                 current = dict[prev] + first;
             }
@@ -104,7 +149,7 @@ int main(int argc, char* argv[]){
     }
 
     LZWcompress(argv[1]);
-    LZWdecompress("compressed.txt");
+    LZWdecompress("compressed.dat");
 
     return 0;
 }
